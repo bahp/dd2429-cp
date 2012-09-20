@@ -100,7 +100,7 @@ fprintf(fid,'               ] } \n');
 fprintf(fid,'	           coordIndex [ \n');
 
 % Print 3D points with ,.
-for i = 1:am_points-1 % Same number of 3D than 2D points.
+for i = 1:size(triang,1) % Same number of 3D than 2D points.
     fprintf(fid,'	              %f %f %f -%f,\n', ...
         [(triang(i,1)-1) (triang(i,2)-1) (triang(i,3)-1) -1]);
 end
@@ -119,7 +119,7 @@ if (para1 == 0)
   % Print 2D points with ,.
   xsize = image_size(1); % Get the sizex.
   ysize = image_size(2); % Get the sizey.
-  for i = 1:am_points-1  % Same number of 3D than 2D points.
+  for i = 1:size(data,2) % Same number of 3D than 2D points.
      fprintf(fid,'	              %f %f,\n', ...
              [(data(3*para2-2,i)/xsize), (1-(data(3*para2-1,i)/ysize))]); 
   end
