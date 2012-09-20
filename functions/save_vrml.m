@@ -97,18 +97,20 @@ fprintf(fid,'               ] } \n');
 % store all the triangles   -->                         FILL IN THIS PART
 %--------------------------------------------------------------------------
 % Open element.
-fprintf(fid,'	          coordIndex [ \n');
+fprintf(fid,'	           coordIndex [ \n');
 
 % Print 3D points with ,.
 for i = 1:am_points-1 % Same number of 3D than 2D points.
-    fprintf(fid,'%d %d %d -1,\n',triang(i,1),triang(i,2),triang(i,3));
+    fprintf(fid,'	              %d %d %d -1,\n',triang(i,1), ...
+            triang(i,2),triang(i,3));
 end
 
 % Last point without ,.
-fprintf(fid,'%d %d %d -1\n',triang(am_points,1),triang(am_points,2),triang(i,3));
+fprintf(fid,'	           %d %d %d -1\n',triang(am_points,1), ...
+        triang(am_points,2),triang(i,3));
 
 % CLose element.
-fprintf(fid,'               ] \n');
+fprintf(fid,'	           ] \n');
 
 %--------------------------------------------------------------------------
 % store all the texture    -->                          FILL IN THIS PART
@@ -122,14 +124,16 @@ if (para1 == 0)
   xsize = image_size(1); % Get the sizex.
   ysize = image_size(2); % Get the sizey.
   for i = 1:am_points-1 % Same number of 3D than 2D points.
-     fprintf(fid,'%d %d,\n', data(1,i)/xsize ,1-(data(2,i)/ysize)); 
+     fprintf(fid,'	              %d %d,\n', ...
+             data(1,i)/xsize ,1-(data(2,i)/ysize)); 
   end
   
   % Last point without ,.
-  fprintf(fid,'%d %d\n', data(1,am_points)/xsize ,1-(data(2,am_points)/ysize));
+  fprintf(fid,'	              %d %d\n', data(1,am_points)/xsize , ...
+          1-(data(2,am_points)/ysize));
   
   % Close element.
-  fprintf(fid,'               ] } \n');
+  fprintf(fid,'	           ] } \n');
 end
 
 fprintf(fid,'	         }	\n');	    	  
