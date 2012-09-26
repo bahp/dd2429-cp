@@ -13,9 +13,28 @@
 
 function [cams, cam_centers] = det_uncalib_stereo_cameras(F)
 
+%-------------------------------------------------------------------------
+%                           FILL IN THIS PART
+%-------------------------------------------------------------------------
+% Calculate cameras a matrices Ma = (I|0) and Mb = (SF|h).
+% Calculate Ma.
+Ma = [eye(3) zeros(3,1)];  % Calculate Ma.
 
-%------------------------------
-%
-% FILL IN THIS PART
-%
-%------------------------------
+% Calculate Mb.
+[U,S,V] = svd(F');             % Calculate F'h = 0 (epipol 2nd camera).
+h = V(:,end);
+S = [ 0 -1 1; 1 0 -1; -1 1 0]; % Calculate S (antisymmetric matrix).
+Mb = [S*F h];
+
+% Calculate camera centers.
+% Camera A center (Ma*ta = [0,0,0]');
+[U,S,V] = svd(Ma);
+ta = V(:,end);
+
+% Camera B center (Mb*tb = [0,0,0]');
+[U,S,V] = svd(Mb);
+tb = V(:,end);
+
+% Set the return values.
+cams = [Ma; Mb];
+cam_centers = [ta tb];
