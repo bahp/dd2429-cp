@@ -46,11 +46,11 @@ end
 
 % real data 
 if (~flag_synthetic_data)
-  % load '../data/data_toyhouse.mat';
-  data = [];
-  [images,image_names] = load_images_grey(name_file_images, am_cams);
-  data = click_multi_view(images, am_cams, data, 2); % for clicking and displaying data
-  save '../data/toyhouse_data.mat' data;
+  load '../data/toyhouse_data_72.mat';
+  %data = [];
+  [images,image_names] = load_images_grey(name_file_images, am_cams)
+  %data = click_multi_view(images, am_cams, data, 2); % for clicking and displaying data
+  %save '../data/toyhouse_data.mat' data;
 end
 
 %-----------------------------------------------
@@ -58,7 +58,7 @@ end
 %-----------------------------------------------
 
 % determine the Fundamental matrix 
-F = det_F_matrix(data(1:3,:), data(4:6,:));
+F = det_F_matrix(data(1:3,:), data(4:6,:),1);
 
 % get the projective reconstruction 
 [cams, cam_centers] = det_uncalib_stereo_cameras(F); 
@@ -80,35 +80,61 @@ fprintf('Average error: %5.2fpixel; Maximum error: %5.2fpixel \n', error_average
 %-----------------------------------------------------
 % Rectify the reconstruction: cameras and 3D model
 %-----------------------------------------------------
-
 if (flag_synthetic_data)
-  model_synthetic_points = [1,13,25,37,48];
-  model_synthetic = [];  
-  for hi1 = 1:5
-    hd1 = model_synthetic_points(1,hi1); 
-    model_synthetic = [model_synthetic,model_sim(:,model_synthetic_points(1,hi1))];
-  end
+    
+   % Print model and model_sim. 
+   model(:,1:5)
+   model_sim(:,1:5)
+    
+   model_synthetic_points = [1,13,25,37,48];
+   model_synthetic = [];  
+   for hi1 = 1:5
+      hd1 = model_synthetic_points(1,hi1); 
+      model_synthetic = [model_synthetic, model_sim(:,hd1)];
+   end
+  
 else 
-
-  %------------------------------
-  %
-  % FILL IN THIS PART 
-  %
-  %------------------------------
-
+  
+  %-----------------------------------------------------------------------
+  %                         FILL IN THIS PART 
+  %-----------------------------------------------------------------------
+  p1 = [0 0 0 1]';            % 1 in pictures.
+  p2 = p1 +  [0  10  0  0]';  % 2 in pictures.
+  p3 = p1 +  [0   0  9  0]';  % 3 in pictures.
+  p4 = p1 +  [10  5 15  0]';  % 4 in pictures.
+  p5 = p1 +  [27  0  0  0]';  % 5 in pictures.
+  p6 = p1 +  [0  10  9  0]';  % 6 in pictures.
+  p7 = p1 +  [10  0  9  0]';  % 7 in pictures.
+  p11 = p1 + [27  5 15  0]';  % 11 in pictures.
+  model_sim = [p1 p2 p3 p5 p11];
+  
+  % Print model and model_sim.
+  model(:,1:5)
+  model_sim(:,1:5)
+  
+  figure(4);
+  plot3(model_sim(1,:),model_sim(2,:),model_sim(3,:),'xb')
+  axis([-1 30 -1 15 0 20])
+  xlabel('x'); ylabel('y'); zlabel('z');
+  
+  model_synthetic_points = [1,2,3,5,11];
+  model_synthetic = [];  
+  for hi1 = 1:length(model_synthetic_points)
+     hd1 = model_synthetic_points(1,hi1); 
+     model_synthetic = [model_synthetic, model_sim(:,hi1)];
+  end
 end
 
 % get the rectification matrix 
 H = det_rectification_matrix(model(:,model_synthetic_points), model_synthetic); 
-% H = eye(4); 
 
 % rectify the cameras and the model
-
-%------------------------------
-%
-% FILL IN THIS PART
-%
-%------------------------------
+%-------------------------------------------------------------------------
+%                           FILL IN THIS PART
+%-------------------------------------------------------------------------
+model_rec = H*model;              % rectified model (P'=HP).
+cams_rec = cams*inv(H);           % rectified cams matrices. (M'=Minv(H))
+cam_centers_rec = H*cam_centers;  % rectified cam centers.
 
 % normalize the the 4th coordinate of model points is 1
 [model_rec] = norm_points_to_one(model_rec);  
